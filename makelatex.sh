@@ -12,7 +12,7 @@ Help () {
     echo "    -g|--glossary         makeglossaries is executed"
 }
 
-ARGS=$(getopt -a --options f:bgh --long "file:,bibliography,glossary,help" -- "$@")
+ARGS=$(getopt -a --options f:bghv --long "file:,bibliography,glossary,help,version" -- "$@")
 
 eval set -- "$ARGS"
 
@@ -36,6 +36,9 @@ while true; do
             break;;
         -h|--help)
             Help
+            exit;;
+        -v|--version)
+            echo mktex $version
             exit;;
         --)
             texfile="main.tex"
