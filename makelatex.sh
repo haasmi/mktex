@@ -1,6 +1,29 @@
 #! /bin/bash
 
 version=0.1
+texfile="main.tex"
+pdffile="main.pdf"
+file="main"
+
+
+Remove () {
+    rm "$file.aux"
+    rm "$file.bbl"
+    rm "$file.blg"
+    rm "$file.glg"
+    rm "$file.glo"
+    rm "$file.gls"
+    rm "$file.glsdefs"
+    rm "$file.ist"
+    rm "$file.lof"
+    rm "$file.log"
+    rm "$file.lol"
+    rm "$file.lot"
+    rm "$file.pdf"
+    rm "$file.pyg"
+    rm "$file.toc"
+    ls
+}
 
 Help () {
     echo "Call: mktex [-f DATEI] | [-b] | [-g]"
@@ -12,61 +35,45 @@ Help () {
     echo "    -g|--glossary         makeglossaries is executed"
 }
 
-ARGS=$(getopt -a --options f:bghv --long "file:,bibliography,glossary,help,version" -- "$@")
+ARGS=$(getopt -a --options f:bghvr --long "file:,bibliography,glossary,help,version,remove" -- "$@")
 
 eval set -- "$ARGS"
 
 while true; do
-    case "$1" in 
+    case "$1" in
         -f|--file)
             file=$2
-            texfile="${2}.tex"
-            pdffile="${2}.pdf"
-            shift 2
-            break;;
-        -b|--bibliography)
-            texfile="main.tex"
-            pdffile="main.pdf"
-            file="main"
-            break;;
-        -g|--glossaries)
-            texfile="main.tex"
-            pdffile="main.pdf"
-            file="main"
-            break;;
-        -h|--help)
-            Help
-            exit;;
+            textfile="${2}.tex"
+            pdffile="${2}.tex"
+            shift 2;;
         -v|--version)
             echo mktex $version
             exit;;
-        --)
-            texfile="main.tex"
-            pdffile="main.pdf"
-            file="main"
-            break;;
+        -h|--help)
+            Help
+            exit;;
+        --|-b|--bibliography|-g|--glossary|-r|--remove)
+            break;
     esac
 done
 
+if [[ "$1" == "-r" ]] || [[ "$1" == "--remove" ]];then
+    Remove
+    exit;
+else 
+    :
+fi
 
 pdflatex -shell-escape $texfile | grep -i ".*:[0-9]*:.*\|error"
 
 while true; do
-    case "$1" in
+    case "$1" in 
         -b|--bibliography)
             bibtex $file
-            shift 1
-            break;;
-        --)
-            break;;
-    esac
-done
-
-while true; do
-    case "$1" in
-        -g|--glossary)
-            makeglossaries main 
-            break;;
+            shift 1;;
+        -g|--glossaries)
+            makeglossaries $file
+            shift 1;;
         --)
             break;;
     esac
